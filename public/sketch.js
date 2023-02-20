@@ -1,5 +1,3 @@
-
-
 function setup() {
     createCanvas(400, 400);
 
@@ -44,8 +42,20 @@ function drawCircle() {
   if (yrand + size/2 > height) {
     yrand = width - size/2;
   }
+  fill(randColor());
+  noStroke();
+  // tint(255,127); // doesn't seem to be working, will revisit
   ellipse(xrand,yrand,size)
 }
+
+function randColor() {
+  let r = Math.floor(Math.random()*255);
+  let g = Math.floor(Math.random()*255);
+  let b = Math.floor(Math.random()*255);
+  let a = Math.min(Math.max(Math.floor(Math.random()*255),100),200);
+  return color(r,g,b,a);
+}
+
 
 // types of shapes/objects:
 // point(x,y), line(four params), unsure what each stand for yet
