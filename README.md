@@ -1,0 +1,1 @@
+The goal of this respository is to learn about the fundamentals of p5.js and to ultimately develop an algorithm to make generative artwork.
