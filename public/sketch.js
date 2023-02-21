@@ -11,9 +11,9 @@ function draw() {
   // min of three circles looks a bit sparse tbh
   let numCircles = Math.max(Math.floor(Math.random() * 29),3);
   for (let i=0; i < numCircles; i++) {
-    drawCircle();
+    drawRandCircle();
   }
-
+  randBezier();
 }
 
 // can later update this to input parameters for x, y coords
@@ -25,7 +25,7 @@ function draw() {
 // possible positionings to look into: sin/cos/other trig waves, polynomials, bezier curves, spirals, etc
 // when generating positionings, may also want to generate sizes as well
 // 
-function drawCircle() {
+function drawRandCircle() {
   // for now, just capping circle size to between 5-100
   let size = Math.max(Math.floor(Math.random()*100),5);
   let xrand = Math.floor(Math.random()*width);
@@ -44,18 +44,62 @@ function drawCircle() {
   }
   fill(randColor());
   noStroke();
-  // tint(255,127); // doesn't seem to be working, will revisit
   ellipse(xrand,yrand,size)
 }
 
-function randColor() {
+function randColor(transparent=true) {
   let r = Math.floor(Math.random()*255);
   let g = Math.floor(Math.random()*255);
   let b = Math.floor(Math.random()*255);
-  let a = Math.min(Math.max(Math.floor(Math.random()*255),100),200);
+  
+  let a = transparent ? Math.min(Math.max(Math.floor(Math.random()*255),100),200) : 255;
   return color(r,g,b,a);
 }
 
+
+// first tried making all points random, but that led to possibility of very small, potentially not as interesting curves
+// second, trying anchoring the first and last points to top left and bottom right respectively
+// next, will want to try to add some further randomness back into the equation
+// -- thought is to have an array of possible starting and ending (x,y) coordinate pairs, like [[(x1,y1),(x4,y4)]]
+// -- this would allow the possibility for more varied arc paths and could lead to more interesting artwork
+// -- then, could randomly select the start/end points in some manner
+// Further, after that in place, would like to experiment with other ways to generate circle placements
+// Then, in the draw() function, could randomly select which one(s) to generate and lead to more variance of output
+function randBezier() {
+  // let x1 = Math.floor(Math.random()*width),
+  let x1 = 50
+    x2 = Math.floor(Math.random()*width),
+    x3 = Math.floor(Math.random()*width),
+    // x4 = Math.floor(Math.random()*width);
+    x4 = width - 50;
+  // let y1 = Math.floor(Math.random()*height),
+  let y1 = 50
+    y2 = Math.floor(Math.random()*height),
+    y3 = Math.floor(Math.random()*height),
+    // y4 = Math.floor(Math.random()*height);
+    y4 = height - 50;
+  // noFill();
+  // stroke(0)
+  // bezier(x1, y1, x2, y2, x3, y3, x4, y4);
+  bezierPointCircles(x1,x2,x3,x4,y1,y2,y3,y4,12);
+}
+
+function bezierPointCircles(x1,x2,x3,x4,y1,y2,y3,y4,num=10) {
+  for (let i=0; i<=num; i++) {
+    let t = i / num;
+    let x = bezierPoint(x1,x2,x3,x4,t)
+    let y = bezierPoint(y1,y2,y3,y4,t)
+    noStroke()
+    fill(randColor(false))
+    let size = Math.max(Math.floor(Math.random()*50),10)
+    ellipse(x,y,size)
+  }
+}
+
+
+
+// could look to generate a button or allow user to click to generate a new image
+// for purposes of if ever wanted to deploy
 
 // types of shapes/objects:
 // point(x,y), line(four params), unsure what each stand for yet
