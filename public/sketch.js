@@ -13,7 +13,11 @@ function draw() {
   for (let i=0; i < numCircles; i++) {
     drawRandCircle();
   }
-  randBezier();
+
+  // format for endpoints is an array of [x1,y1,x4,y4]
+  const bezierEndPoints = [[50,50,width-50,height-50],[width/2,50,width/2,height-50],[50,height-50,width-50,50],[50,height/2,width-50,height/2]]
+
+  randBezier(bezierEndPoints);
 }
 
 // can later update this to input parameters for x, y coords
@@ -65,22 +69,24 @@ function randColor(transparent=true) {
 // -- then, could randomly select the start/end points in some manner
 // Further, after that in place, would like to experiment with other ways to generate circle placements
 // Then, in the draw() function, could randomly select which one(s) to generate and lead to more variance of output
-function randBezier() {
-  // let x1 = Math.floor(Math.random()*width),
-  let x1 = 50
+
+
+function randBezier(endpoints) {
+  let fixedCoords = endpoints[Math.floor(Math.random()*endpoints.length)]
+  let x1 = fixedCoords[0]
     x2 = Math.floor(Math.random()*width),
     x3 = Math.floor(Math.random()*width),
-    // x4 = Math.floor(Math.random()*width);
-    x4 = width - 50;
-  // let y1 = Math.floor(Math.random()*height),
-  let y1 = 50
+    x4 = fixedCoords[2]
+  let y1 = fixedCoords[1]
     y2 = Math.floor(Math.random()*height),
     y3 = Math.floor(Math.random()*height),
-    // y4 = Math.floor(Math.random()*height);
-    y4 = height - 50;
+    y4 = fixedCoords[3]
   // noFill();
   // stroke(0)
   // bezier(x1, y1, x2, y2, x3, y3, x4, y4);
+  
+  // may look into randomly generating the number of circles to draw, with some floor and ceiling parameters
+  // amount of circles could also dictate floor/ceiling of size as well
   bezierPointCircles(x1,x2,x3,x4,y1,y2,y3,y4,12);
 }
 
