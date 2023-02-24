@@ -11,13 +11,18 @@ function draw() {
   // min of three circles looks a bit sparse tbh
   let numCircles = Math.max(Math.floor(Math.random() * 29),3);
   for (let i=0; i < numCircles; i++) {
-    drawRandCircle();
+    // drawRandCircle();
   }
 
   // format for endpoints is an array of [x1,y1,x4,y4]
-  const bezierEndPoints = [[50,50,width-50,height-50],[width/2,50,width/2,height-50],[50,height-50,width-50,50],[50,height/2,width-50,height/2]]
+  const bezierEndPoints = [[25,25,width-25,height-25],[width/2,25,width/2,height-25],[25,height-25,width-25,25],[25,height/2,width-25,height/2]]
 
-  randBezier(bezierEndPoints);
+  // trying slightly more random method
+  // following array contains 4 subarrays, each standing for possible values of x1,y1,x4,y4 respectively
+  const bezierEndPoints2 = [[25,width/2],[25,height-25,height/2],[width-25,width/2],[height-25,25,height/2]]
+  
+  // randBezier(bezierEndPoints);
+  randBezier2(bezierEndPoints2);
 }
 
 // can later update this to input parameters for x, y coords
@@ -90,14 +95,27 @@ function randBezier(endpoints) {
   bezierPointCircles(x1,x2,x3,x4,y1,y2,y3,y4,12);
 }
 
-function bezierPointCircles(x1,x2,x3,x4,y1,y2,y3,y4,num=10) {
+function randBezier2(endpoints) {
+  let x1 = endpoints[0][Math.floor(Math.random()*endpoints[0].length)],
+    x2 = Math.floor(Math.random()*width),
+    x3 = Math.floor(Math.random()*width),
+    x4 = endpoints[2][Math.floor(Math.random()*endpoints[2].length)]
+  let y1 = endpoints[1][Math.floor(Math.random()*endpoints[1].length)]
+    y2 = Math.floor(Math.random()*height),
+    y3 = Math.floor(Math.random()*height),
+    y4 = endpoints[3][Math.floor(Math.random()*endpoints[3].length)]
+
+  bezierPointCircles(x1,x2,x3,x4,y1,y2,y3,y4,20,25,5);
+}
+
+function bezierPointCircles(x1,x2,x3,x4,y1,y2,y3,y4,num=10,maxSize=50,minSize=10) {
   for (let i=0; i<=num; i++) {
     let t = i / num;
     let x = bezierPoint(x1,x2,x3,x4,t)
     let y = bezierPoint(y1,y2,y3,y4,t)
     noStroke()
     fill(randColor(false))
-    let size = Math.max(Math.floor(Math.random()*50),10)
+    let size = Math.max(Math.floor(Math.random()*maxSize),minSize)
     ellipse(x,y,size)
   }
 }
