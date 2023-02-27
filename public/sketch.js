@@ -1,5 +1,7 @@
 const circlePoints = [];
 
+let iteration = 0;
+
 function setup() {
     createCanvas(1500, 500, SVG);
 
@@ -7,6 +9,7 @@ function setup() {
   }
   
 function draw() {
+  iteration += 1;
   background(randColor());
 
   // for now, just arbitrarily testing out different ranges
@@ -43,7 +46,14 @@ function draw() {
   }
 
   // can now save to svg files; just gets placed in downloads folder
-  // save("test.svg")
+  // save(`banner_loop_${iteration}.svg`)
+  console.log(`Draw function has run ${iteration} time(s)`)
+  if (iteration < 9) {
+    loop()
+  }
+  else {
+    noLoop()
+  }
 }
 
 // can later update this to input parameters for x, y coords
@@ -104,8 +114,6 @@ function drawRandCircle() {
   noStroke();
   ellipse(xrand,yrand,size)
   circlePoints.push([xrand,yrand,size])
-  print(circlePoints.length)
-
 }
 
 function randColor(transparent=true,allowSolid=false) {
