@@ -1,5 +1,7 @@
+const circlePoints = [];
+
 function setup() {
-    createCanvas(400, 400);
+    createCanvas(400, 400, SVG);
 
     noLoop();
   }
@@ -39,6 +41,10 @@ function draw() {
   for (let i=0; i < numCircles; i++) {
     drawRandCircle();
   }
+  // drawRandCircle()
+
+  // can now save to svg files; just gets placed in downloads folder
+  // save("test.svg")
 }
 
 // can later update this to input parameters for x, y coords
@@ -50,9 +56,14 @@ function draw() {
 // possible positionings to look into: sin/cos/other trig waves, polynomials, bezier curves, spirals, etc
 // when generating positionings, may also want to generate sizes as well
 // 
+
+function distance(x1,y1,x2,y2) {
+  return Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2))
+}
+
 function drawRandCircle() {
   // for now, just capping circle size to between 5-100
-  let size = Math.max(Math.floor(Math.random()*100),5);
+  let size = Math.max(Math.floor(Math.random()*width/4),5);
   let xrand = Math.floor(Math.random()*width);
   let yrand = Math.floor(Math.random()*height);
   if (xrand < size/2) {
@@ -67,9 +78,37 @@ function drawRandCircle() {
   if (yrand + size/2 > height) {
     yrand = width - size/2;
   }
+  let distancesToBezierCircles = circlePoints.map(point => [distance(xrand,yrand,point[0],point[1]),point[2]])
+
+  let overlapping = distancesToBezierCircles.filter(dist => dist[0] - dist[1]/2 <= size/2)
+
+  // should clean this up and make a helper function to generate the point and size
+  while(overlapping.length) {
+    size = Math.max(Math.floor(Math.random()*width/4),5);
+    xrand = Math.floor(Math.random()*width);
+    yrand = Math.floor(Math.random()*height);
+    if (xrand < size/2) {
+      xrand = size/2;
+    }
+    if (yrand < size/2) {
+      yrand = size/2;
+    }
+    if (xrand + size/2 > width) {
+      xrand = width - size/2;
+    }
+    if (yrand + size/2 > height) {
+      yrand = width - size/2;
+    }
+    distancesToBezierCircles = circlePoints.map(point => [distance(xrand,yrand,point[0],point[1]),point[2]])
+    overlapping = distancesToBezierCircles.filter(dist => dist[0] - dist[1]/2 <= size/2)
+  }
+
   fill(randColor());
   noStroke();
   ellipse(xrand,yrand,size)
+  circlePoints.push([xrand,yrand,size])
+  print(circlePoints.length)
+
 }
 
 function randColor(transparent=true,allowSolid=false) {
@@ -102,9 +141,6 @@ function randBezier(endpoints,transparent=false) {
     y2 = Math.floor(Math.random()*height),
     y3 = Math.floor(Math.random()*height),
     y4 = fixedCoords[3]
-  // noFill();
-  // stroke(0)
-  // bezier(x1, y1, x2, y2, x3, y3, x4, y4);
   
   // may look into randomly generating the number of circles to draw, with some floor and ceiling parameters
   // amount of circles could also dictate floor/ceiling of size as well
@@ -121,15 +157,11 @@ function randBezier2(endpoints,transparent=false) {
     y2 = Math.floor(Math.random()*height),
     y3 = Math.floor(Math.random()*height),
     y4 = endpoints[3].filter(val => val != y1)[Math.floor(Math.random()*(endpoints[3].length-1))]
-  // console.log(y1,y4)
 
   // could calulate distance between (x1,y1) and (x4,y4) to determine num circles, maxSize, etc
   let straightDist = Math.sqrt((x4-x1)*(x4-x1) + (y4-y1)*(y4-y1))
-  console.log(`points: (${x1},${y1}), (${x4},${y4})`)
-  console.log(straightDist)
   let numCircles = Math.max(Math.floor(Math.random()*Math.sqrt(straightDist)),10)
   let maxSize = Math.max(Math.floor(straightDist/numCircles)*1.5,20)
-  console.log(`num circles: ${numCircles}, max size: ${maxSize}`)
   bezierPointCircles(x1,x2,x3,x4,y1,y2,y3,y4,numCircles,maxSize,10,transparent);
 }
 
@@ -143,6 +175,7 @@ function bezierPointCircles(x1,x2,x3,x4,y1,y2,y3,y4,num=10,maxSize=50,minSize=10
     fill(randColor(transparent))
     // let size = Math.max(Math.floor(Math.random()*maxSize),minSize)
     ellipse(x,y,size)
+    circlePoints.push([x,y,size])
   }
 }
 
