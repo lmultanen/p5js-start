@@ -1,13 +1,13 @@
 const circlePoints = [];
 
 function setup() {
-    createCanvas(400, 400, SVG);
+    createCanvas(1500, 500, SVG);
 
     noLoop();
   }
   
 function draw() {
-  background(220);
+  background(randColor());
 
   // for now, just arbitrarily testing out different ranges
   // min of three circles looks a bit sparse tbh
@@ -41,7 +41,6 @@ function draw() {
   for (let i=0; i < numCircles; i++) {
     drawRandCircle();
   }
-  // drawRandCircle()
 
   // can now save to svg files; just gets placed in downloads folder
   // save("test.svg")
@@ -53,9 +52,7 @@ function draw() {
 // what could be kinda neat would be to have several different generation methods, then could randomly select which one(s) to use
 // may also want to try to implement something to prevent too much overlap as well in the future
 
-// possible positionings to look into: sin/cos/other trig waves, polynomials, bezier curves, spirals, etc
-// when generating positionings, may also want to generate sizes as well
-// 
+// possible positionings to look into: sin/cos/other trig waves, polynomials, spirals, etc
 
 function distance(x1,y1,x2,y2) {
   return Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2))
