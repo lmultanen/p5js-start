@@ -9,20 +9,36 @@ function draw() {
 
   // for now, just arbitrarily testing out different ranges
   // min of three circles looks a bit sparse tbh
-  let numCircles = Math.max(Math.floor(Math.random() * 29),3);
-  for (let i=0; i < numCircles; i++) {
-    // drawRandCircle();
-  }
 
   // format for endpoints is an array of [x1,y1,x4,y4]
   const bezierEndPoints = [[25,25,width-25,height-25],[width/2,25,width/2,height-25],[25,height-25,width-25,25],[25,height/2,width-25,height/2]]
 
   // trying slightly more random method
   // following array contains 4 subarrays, each standing for possible values of x1,y1,x4,y4 respectively
-  const bezierEndPoints2 = [[25,width/2],[25,height-25,height/2],[width-25,width/2],[height-25,25,height/2]]
+  let xcoords = [10,width-10]
+  for (let i=Math.sqrt(width); i < width - Math.sqrt(width); i+=Math.sqrt(width)) {
+    xcoords.push(i)
+  }
+  let ycoords = [10,height-10]
+  for (let i=Math.sqrt(height); i < height - Math.sqrt(height); i+=Math.sqrt(height)) {
+    ycoords.push(i)
+  }
+  // previous xcoords: [25,width-25,width/2,width/3,width/4]
+  // previous ycoords: [25,height-25,height/2,height/3,height/4]
+  // honestly probably don't even need this array anymore, can just pass in xcoords and ycoords to the function
+  const bezierEndPoints2 = [xcoords,ycoords,xcoords,ycoords]
   
-  // randBezier(bezierEndPoints);
-  randBezier2(bezierEndPoints2);
+  // randBezier(bezierEndPoints,true);
+  // randBezier2(bezierEndPoints2,true);
+  let numBeziers = Math.floor(Math.random()*4) + 1
+  for (let i=0; i<numBeziers; i++) {
+    randBezier2(bezierEndPoints2,i%2===0);
+  }
+
+  let numCircles = Math.max(Math.floor(Math.random() * (20-numBeziers)),3);
+  for (let i=0; i < numCircles; i++) {
+    drawRandCircle();
+  }
 }
 
 // can later update this to input parameters for x, y coords
@@ -56,12 +72,12 @@ function drawRandCircle() {
   ellipse(xrand,yrand,size)
 }
 
-function randColor(transparent=true) {
+function randColor(transparent=true,allowSolid=false) {
   let r = Math.floor(Math.random()*255);
   let g = Math.floor(Math.random()*255);
   let b = Math.floor(Math.random()*255);
   
-  let a = transparent ? Math.min(Math.max(Math.floor(Math.random()*255),100),200) : 255;
+  let a = transparent ? Math.min(Math.max(Math.floor(Math.random()*255),100),allowSolid ? 255 :200) : 255;
   return color(r,g,b,a);
 }
 
@@ -76,7 +92,7 @@ function randColor(transparent=true) {
 // Then, in the draw() function, could randomly select which one(s) to generate and lead to more variance of output
 
 
-function randBezier(endpoints) {
+function randBezier(endpoints,transparent=false) {
   let fixedCoords = endpoints[Math.floor(Math.random()*endpoints.length)]
   let x1 = fixedCoords[0]
     x2 = Math.floor(Math.random()*width),
@@ -92,30 +108,40 @@ function randBezier(endpoints) {
   
   // may look into randomly generating the number of circles to draw, with some floor and ceiling parameters
   // amount of circles could also dictate floor/ceiling of size as well
-  bezierPointCircles(x1,x2,x3,x4,y1,y2,y3,y4,12);
+  bezierPointCircles(x1,x2,x3,x4,y1,y2,y3,y4,12,50,10,transparent);
 }
 
-function randBezier2(endpoints) {
+function randBezier2(endpoints,transparent=false) {
   let x1 = endpoints[0][Math.floor(Math.random()*endpoints[0].length)],
     x2 = Math.floor(Math.random()*width),
     x3 = Math.floor(Math.random()*width),
-    x4 = endpoints[2][Math.floor(Math.random()*endpoints[2].length)]
+    x4 = endpoints[2].filter(val => val != x1)[Math.floor(Math.random()*(endpoints[2].length-1))]
+
   let y1 = endpoints[1][Math.floor(Math.random()*endpoints[1].length)]
     y2 = Math.floor(Math.random()*height),
     y3 = Math.floor(Math.random()*height),
-    y4 = endpoints[3][Math.floor(Math.random()*endpoints[3].length)]
+    y4 = endpoints[3].filter(val => val != y1)[Math.floor(Math.random()*(endpoints[3].length-1))]
+  // console.log(y1,y4)
 
-  bezierPointCircles(x1,x2,x3,x4,y1,y2,y3,y4,20,25,5);
+  // could calulate distance between (x1,y1) and (x4,y4) to determine num circles, maxSize, etc
+  let straightDist = Math.sqrt((x4-x1)*(x4-x1) + (y4-y1)*(y4-y1))
+  console.log(`points: (${x1},${y1}), (${x4},${y4})`)
+  console.log(straightDist)
+  let numCircles = Math.max(Math.floor(Math.random()*Math.sqrt(straightDist)),10)
+  let maxSize = Math.max(Math.floor(straightDist/numCircles)*1.5,20)
+  console.log(`num circles: ${numCircles}, max size: ${maxSize}`)
+  bezierPointCircles(x1,x2,x3,x4,y1,y2,y3,y4,numCircles,maxSize,10,transparent);
 }
 
-function bezierPointCircles(x1,x2,x3,x4,y1,y2,y3,y4,num=10,maxSize=50,minSize=10) {
+function bezierPointCircles(x1,x2,x3,x4,y1,y2,y3,y4,num=10,maxSize=50,minSize=10,transparent=false) {
+  let size = Math.max(Math.floor(Math.random()*maxSize),minSize)
   for (let i=0; i<=num; i++) {
     let t = i / num;
     let x = bezierPoint(x1,x2,x3,x4,t)
     let y = bezierPoint(y1,y2,y3,y4,t)
     noStroke()
-    fill(randColor(false))
-    let size = Math.max(Math.floor(Math.random()*maxSize),minSize)
+    fill(randColor(transparent))
+    // let size = Math.max(Math.floor(Math.random()*maxSize),minSize)
     ellipse(x,y,size)
   }
 }
